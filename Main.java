@@ -1,7 +1,12 @@
 //some comments: why does cmov exist when Y86 doesn't have cmp and test?
 //do we need condition codes?
-//things to do: figure out stack + memory
-
+/*things TODO: 
+1.  Fill in IFUN 
+2. Update flags
+3. Finishing out ICODES,
+4. Figure out what halt does
+5. figure out stack + memory
+*/
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -18,6 +23,7 @@ class Main implements ActionListener{
     char ifun = code.charAt(PC+1);
 
     public static void main(String args[]) throws IOException{
+        System.out.println("start");
         FileReader fr = new FileReader("file.txt");
         BufferedReader br = new BufferedReader(fr);
         code = br.readLine();
@@ -39,7 +45,9 @@ class Main implements ActionListener{
     }
 
     public void actionPerformed(ActionEvent e){
+        System.out.println("Button Pressed");
         fetch(code);
+        System.out.println("After Fetch");
     }
 
     public void fetch(String code){
@@ -148,9 +156,9 @@ class Main implements ActionListener{
     }};
 
     static HashMap<String, Integer> conditionCodes = new HashMap<String, Integer>(){{
-        put("CF", 0);
-        put("SF", 0);
-        put("ZF", 0);
-        put("OF", 0);
+        put("CF", 0); //Carry flag
+        put("SF", 0); //Sign flag
+        put("ZF", 0); //Zero flag
+        put("OF", 0); //Overflow flag
     }};
 }
