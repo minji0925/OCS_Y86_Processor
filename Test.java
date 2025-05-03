@@ -19,6 +19,7 @@ public class Test{
     static String code = "";
     static int PC = 0;
     static char icode, ifun = '0';
+    static int[] memory = new int[300];
 
     public static void main(String args[]) throws IOException{
         try {
@@ -130,12 +131,13 @@ public class Test{
                 valB = registers.get(4);
                 break;
         }
-        execute(valA, valB, valC);
+        execute(valA, valB, valC, valP);
     }
 
-    public static void execute(int valA, int valB, int valC){
+    public static void execute(int valA, int valB, int valC, int valP){
         int valE = 0;
         switch(icode){
+            //cmov - do the switch case thing
             case '2':
                 valE = 0 + valA;
                 break;
@@ -220,10 +222,22 @@ public class Test{
                 valE = valB + 8;
                 break;
         }
+        memory(valA, valB, valC, valE, valP);
     }
 
-    public static void memory(){
-
+    //this needs some editing - memory should be organized in a way where each element is one digit of a hex number
+    public static void memory(int valA, int valB, int valC, int valE, int valP){
+        int valM = 0;
+        switch(ifun){
+            case '4':
+                memory[valE] = valA;
+                break;
+            case '5':
+                valM = memory[valE];
+                break;
+            case '8':
+                memory[valE] = valP;
+        }
     }
 
     public static void writeBack(){
