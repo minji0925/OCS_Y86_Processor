@@ -131,10 +131,10 @@ public class Test{
                 valB = registers.get(4);
                 break;
         }
-        execute(valA, valB, valC, valP);
+        execute(rA, rB, valA, valB, valC, valP);
     }
 
-    public static void execute(int valA, int valB, int valC, int valP){
+    public static void execute(int rA, int rB, int valA, int valB, int valC, int valP){
         int valE = 0;
         switch(icode){
             //cmov - do the switch case thing
@@ -148,10 +148,14 @@ public class Test{
                 valE = valB + valC;
                 break;
             case '5':
-                valE = valB + valE;
+                valE = valB + valC;
                 break;
             //operation - switch case based on ifun
             case '6':
+                //reset condition codes
+                conditionCodes.replace("ZF", 0);
+                conditionCodes.replace("SF", 0);
+                conditionCodes.replace("OF", 0);
                 switch(ifun){
                     case '0':
                         valE = valB + valA;
@@ -197,15 +201,16 @@ public class Test{
                         break;
                     //not equal
                     case '4':
-                        valE = ~(conditionCodes.get("ZF"));
+                        valE = conditionCodes.get("ZF") == 0 ? 1 : 0;
                         break;
                     //greater or equal
                     case '5':
-                        valE = ~(conditionCodes.get("SF") ^ conditionCodes.get("OF"));
+                        valE = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 ? 1 : 0;
                         break;
                     //greater
+                    //needs rechecking
                     case '6':
-                        valE = ~(conditionCodes.get("SF") ^ conditionCodes.get("OF")) & (~conditionCodes.get("ZF"));
+                        valE = ((conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 && conditionCodes.get("ZF") == 0) ? 1 : 0;
                         break;
                 }
             //move the stack pointer down 4 bytes to store valP on the top of the stack
@@ -222,13 +227,13 @@ public class Test{
                 valE = valB + 8;
                 break;
         }
-        memory(valA, valB, valC, valE, valP);
+        memory(rA, rB, valA, valB, valC, valE, valP);
     }
 
     //this needs some editing - memory should be organized in a way where each element is one digit of a hex number
-    public static void memory(int valA, int valB, int valC, int valE, int valP){
+    public static void memory(int rA, int rB, int valA, int valB, int valC, int valE, int valP){
         int valM = 0;
-        switch(ifun){
+        switch(icode){
             case '4':
                 memory[valE] = valA;
                 break;
@@ -238,13 +243,53 @@ public class Test{
             case '8':
                 memory[valE] = valP;
         }
+        writeBack(rA, rB, valA, valB, valC, valE, valP, valM);
     }
 
-    public static void writeBack(){
-
+    public static void writeBack(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int valM){
+        switch(icode){
+            //case 2 is conditional move - should depend on condition
+            case '2':
+            case '3':
+            case '5':
+            case '6':
+                registers.replace(rB, valE);
+                break;
+            case '8':
+            case '9':
+            case 'A':
+                registers.replace(4, valE);
+                break;
+            case 'B':
+                registers.replace(4, valE);
+                registers.replace(rA, valM);
+                break;
+        }
+        PCupdate(rA, rB, valA, valB, valC, valE, valP, valM);
     }
 
-    public static void PCupdate(){
+    public static void PCupdate(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int valM){
+        switch(icode){
+            case '7':
+                if(valE == 1){
+                    PC = valC;
+                }
+                else{
+                    PC = valP;
+                }
+                break;
+            case '8':
+                PC = valC;
+                break;
+            case '9':
+                PC = valM;
+                break;
+            default:
+                PC = valP;
+        }
+    }
+
+    public static void printResult(){
 
     }
 
