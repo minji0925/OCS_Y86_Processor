@@ -39,7 +39,7 @@ public class Test{
         switch(icode){
             case '0':
                 System.exit(0);
-            //how to deal with a 0? is it padding or halt? padding in between instructions probably doesn't happen/
+            //how to deal with a 0? is it padding or halt? padding in between instructions probably doesn't happen
                 break;
             case '1':
                 valP = PC + 2;
@@ -135,10 +135,42 @@ public class Test{
     }
 
     public static void execute(int rA, int rB, int valA, int valB, int valC, int valP){
+        //cnd: 0 if condition is not satisfied, 1 if satisfied
+        int cnd = 0;
         int valE = 0;
         switch(icode){
             //cmov - do the switch case thing
             case '2':
+            switch(ifun){
+                case '0':
+                    cnd = 1;
+                    break;
+                //less or equal
+                case '1':
+                    cnd = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) | conditionCodes.get("ZF");
+                    break;
+                //less
+                case '2':
+                    cnd = conditionCodes.get("SF") ^ conditionCodes.get("OF");
+                    break;
+                //equal
+                case '3':
+                    cnd = conditionCodes.get("ZF");
+                    break;
+                //not equal
+                case '4':
+                    cnd = conditionCodes.get("ZF") == 0 ? 1 : 0;
+                    break;
+                //greater
+                //needs rechecking
+                case '5':
+                    cnd = ((conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 && conditionCodes.get("ZF") == 0) ? 1 : 0;
+                    break;
+                //greater or equal
+                case '6':
+                    cnd = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 ? 1 : 0;
+                    break;
+            }
                 valE = 0 + valA;
                 break;
             case '3':
@@ -185,32 +217,32 @@ public class Test{
             case '7':
                 switch(ifun){
                     case '0':
-                        valE = 1;
+                        cnd = 1;
                         break;
                     //less or equal
                     case '1':
-                        valE = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) | conditionCodes.get("ZF");
+                        cnd = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) | conditionCodes.get("ZF");
                         break;
                     //less
                     case '2':
-                        valE = conditionCodes.get("SF") ^ conditionCodes.get("OF");
+                        cnd = conditionCodes.get("SF") ^ conditionCodes.get("OF");
                         break;
                     //equal
                     case '3':
-                        valE = conditionCodes.get("ZF");
+                        cnd = conditionCodes.get("ZF");
                         break;
                     //not equal
                     case '4':
-                        valE = conditionCodes.get("ZF") == 0 ? 1 : 0;
+                        cnd = conditionCodes.get("ZF") == 0 ? 1 : 0;
                         break;
                     //greater or equal
                     case '5':
-                        valE = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 ? 1 : 0;
+                        cnd = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 ? 1 : 0;
                         break;
                     //greater
                     //needs rechecking
                     case '6':
-                        valE = ((conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 && conditionCodes.get("ZF") == 0) ? 1 : 0;
+                        cnd = ((conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 && conditionCodes.get("ZF") == 0) ? 1 : 0;
                         break;
                 }
             //move the stack pointer down 4 bytes to store valP on the top of the stack
@@ -227,11 +259,11 @@ public class Test{
                 valE = valB + 8;
                 break;
         }
-        memory(rA, rB, valA, valB, valC, valE, valP);
+        memory(rA, rB, valA, valB, valC, valE, valP, cnd);
     }
 
     //this needs some editing - memory should be organized in a way where each element is one digit of a hex number
-    public static void memory(int rA, int rB, int valA, int valB, int valC, int valE, int valP){
+    public static void memory(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int cnd){
         int valM = 0;
         switch(icode){
             case '4':
@@ -243,13 +275,16 @@ public class Test{
             case '8':
                 memory[valE] = valP;
         }
-        writeBack(rA, rB, valA, valB, valC, valE, valP, valM);
+        writeBack(rA, rB, valA, valB, valC, valE, valP, valM, cnd);
     }
 
-    public static void writeBack(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int valM){
+    public static void writeBack(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int valM, int cnd){
         switch(icode){
             //case 2 is conditional move - should depend on condition
             case '2':
+                if(cnd == 1){
+                    registers.replace(rB, valE);
+                }
             case '3':
             case '5':
             case '6':
@@ -265,13 +300,13 @@ public class Test{
                 registers.replace(rA, valM);
                 break;
         }
-        PCupdate(rA, rB, valA, valB, valC, valE, valP, valM);
+        PCupdate(rA, rB, valA, valB, valC, valE, valP, valM, cnd);
     }
 
-    public static void PCupdate(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int valM){
+    public static void PCupdate(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int valM, int cnd){
         switch(icode){
             case '7':
-                if(valE == 1){
+                if(cnd == 1){
                     PC = valC;
                 }
                 else{
