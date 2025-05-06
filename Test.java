@@ -19,7 +19,9 @@ public class Test{
     static String code = "";
     static int PC = 0;
     static char icode, ifun = '0';
-    static int[] memory = new int[300];
+
+    //consider each element of the stack array to be one line in the stack (8 bytes, so that it's in sync with the length of valC and pointers)
+    static int[] stack = new int[300];
 
     public static void main(String args[]) throws IOException{
         try {
@@ -49,6 +51,7 @@ public class Test{
                 rB = Integer.parseInt(String.valueOf(code.charAt(PC+3)), 16);
                 valP = PC + 4;
                 break;
+            //valC is now an integer, not hex - no need to worry about conversion from here
             case '3':
                 rA = 15;
                 rB = Integer.parseInt(String.valueOf(code.charAt(PC+3)), 16);
@@ -245,18 +248,18 @@ public class Test{
                         cnd = ((conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 && conditionCodes.get("ZF") == 0) ? 1 : 0;
                         break;
                 }
-            //move the stack pointer down 4 bytes to store valP on the top of the stack
+            //move the stack pointer down 8 bytes (= one element in the stack array) to store valP on the top of the stack
             case '8':
-                valE = valB - 8;
+                valE = valB - 1;
                 break;
             case '9':
-                valE = valB + 8;
+                valE = valB + 1;
                 break;
             case 'A':
-                valE = valB - 8;
+                valE = valB - 1;
                 break;
             case 'B':
-                valE = valB + 8;
+                valE = valB + 1;
                 break;
         }
         memory(rA, rB, valA, valB, valC, valE, valP, cnd);
@@ -267,13 +270,23 @@ public class Test{
         int valM = 0;
         switch(icode){
             case '4':
-                memory[valE] = valA;
+                stack[valE] = valA;
                 break;
             case '5':
-                valM = memory[valE];
+                valM = stack[valE];
                 break;
             case '8':
-                memory[valE] = valP;
+                stack[registers.get(4)] = valP;
+                break;
+            case '9':
+                valM = stack[valA];
+                break;
+            case 'A':
+                stack[valE] = valA;
+                break;
+            case 'B':
+                valM = stack[valA];
+                break;
         }
         writeBack(rA, rB, valA, valB, valC, valE, valP, valM, cnd);
     }
@@ -285,8 +298,11 @@ public class Test{
                 if(cnd == 1){
                     registers.replace(rB, valE);
                 }
-            case '3':
+                break;
             case '5':
+                registers.replace(rA, valM);
+                break;
+            case '3':
             case '6':
                 registers.replace(rB, valE);
                 break;
@@ -333,7 +349,8 @@ public class Test{
         put(1, 0);
         put(2, 0);
         put(3, 0);
-        put(4, 0);
+        //%esp - stack pointer
+        put(4, 299);
         put(5, 0);
         put(6, 0);
         put(7, 0);
