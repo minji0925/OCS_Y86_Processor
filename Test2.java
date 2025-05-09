@@ -1,44 +1,41 @@
-//some comments: why does cmov exist when Y86 doesn't have cmp and test?
-//do we need condition codes?
-/*things TODO: 
-1.  Fill in IFUN 
-2. Update flags
-3. Finishing out ICODES,
-4. Figure out what halt does
-5. figure out stack + memory
-*/
-
-
-/*updated TODO: 
-change PC value - i want to do this based on which hex digit, not by byte
-print after each stage
-ui to control when to run next instruction?
-*/
+import javax.swing.*;
+import java.awt.event.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
-
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
-public class Test{
+public class Test2 {
     static String code = "";
     static int PC = 0;
     static char icode, ifun = '0';
 
-    //consider each element of the stack array to be one line in the stack (8 bytes, so that it's in sync with the length of valC and pointers)
     static int[] stack = new int[300];
 
-    public static void main(String args[]) throws IOException{
-        try {
-            code = Files.lines(Paths.get("file.txt"))
-                                  .collect(Collectors.joining());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) {
+        createAndShowGUI();
+    }
 
-        fetch(code);
+    public static void createAndShowGUI() {
+        JFrame frame = new JFrame("Y86 Processor");
+        frame.setSize(300, 200);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JButton runButton = new JButton("Run Instruction");
+        runButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    code = Files.lines(Paths.get("file.txt")).collect(Collectors.joining());
+                    fetch(code);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        frame.getContentPane().add(runButton);
+        frame.setVisible(true);
     }
 
     public static void fetch(String code){
@@ -351,12 +348,6 @@ public class Test{
     public static void printResult(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int valM, int cnd){
         registers.forEach((key, value) -> System.out.println(key + " " + value));
         System.out.println(PC);
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        fetch(code);
     }
 
     static HashMap<Integer, Integer> registers = new HashMap<Integer, Integer>(){{
