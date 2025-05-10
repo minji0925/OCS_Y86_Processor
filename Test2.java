@@ -11,6 +11,7 @@ public class Test2 {
     static int PC = 0;
     static char icode, ifun = '0';
 
+    //consider each element of the stack array to be one line in the stack (8 bytes, so that it's in sync with the length of valC and pointers)
     static int[] stack = new int[300];
 
     public static void main(String[] args) {
@@ -101,6 +102,7 @@ public class Test2 {
                 valP = PC + 4;
                 break;
         }
+        System.out.println("rA: " + rA + " rB: " + rB + " valC: " + valC + " valP: " + valP);
         decode(rA, rB, valC, valP);
     }
     
@@ -138,6 +140,7 @@ public class Test2 {
                 valB = registers.get(4);
                 break;
         }
+        System.out.println("valA: " + valA + " valB: " + valB);
         execute(rA, rB, valA, valB, valC, valP);
     }
 
@@ -219,6 +222,8 @@ public class Test2 {
                 if((valA > 0 && valB > 0 && valE < 0) || (valA < 0 && valB < 0 && valE > 0)){
                     conditionCodes.replace("OF", 1);
                 }
+                System.out.println("ZF: " + conditionCodes.get("ZF") + " SF: " + conditionCodes.get("SF") + " OF: " + conditionCodes.get("OF"));
+                break;
             //jump - switch case based on which condition
             //use valE to check condition (true or false)
             case '7':
@@ -252,6 +257,7 @@ public class Test2 {
                         cnd = ((conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 && conditionCodes.get("ZF") == 0) ? 1 : 0;
                         break;
                 }
+                break;
             //move the stack pointer down 8 bytes (= one element in the stack array) to store valP on the top of the stack
             case '8':
                 valE = valB - 1;
@@ -266,6 +272,7 @@ public class Test2 {
                 valE = valB + 1;
                 break;
         }
+        System.out.println("valE: " + valE);
         memory(rA, rB, valA, valB, valC, valE, valP, cnd);
     }
 
@@ -275,18 +282,21 @@ public class Test2 {
         switch(icode){
             case '4':
                 stack[valE] = valA;
+                System.out.println("stack[valE]: " + stack[valE]);
                 break;
             case '5':
                 valM = stack[valE];
                 break;
             case '8':
                 stack[registers.get(4)] = valP;
+                System.out.println("stack[%esp]: " + stack[registers.get(4)]);
                 break;
             case '9':
                 valM = stack[valA];
                 break;
             case 'A':
                 stack[valE] = valA;
+                System.out.println("stack[valE]: " + stack[valE]);
                 break;
             case 'B':
                 valM = stack[valA];
@@ -320,6 +330,7 @@ public class Test2 {
                 registers.replace(rA, valM);
                 break;
         }
+        registers.forEach((key, value) -> System.out.print(key + ": " + value + " "));
         PCupdate(rA, rB, valA, valB, valC, valE, valP, valM, cnd);
     }
 
@@ -327,14 +338,14 @@ public class Test2 {
         switch(icode){
             case '7':
                 if(cnd == 1){
-                    PC = valC;
+                    PC = valC*2;
                 }
                 else{
                     PC = valP;
                 }
                 break;
             case '8':
-                PC = valC;
+                PC = valC*2;
                 break;
             case '9':
                 PC = valM;
@@ -342,13 +353,14 @@ public class Test2 {
             default:
                 PC = valP;
         }
-        printResult(rA, rB, valA, valB, valC, valE, valP, valM, cnd);
+        System.out.println("PC: " + PC);
+        //printResult(rA, rB, valA, valB, valC, valE, valP, valM, cnd);
     }
 
-    public static void printResult(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int valM, int cnd){
-        registers.forEach((key, value) -> System.out.println(key + " " + value));
+    /*public static void printResult(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int valM, int cnd){
+        
         System.out.println(PC);
-    }
+    }*/
 
     static HashMap<Integer, Integer> registers = new HashMap<Integer, Integer>(){{
         put(0, 0);
