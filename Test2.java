@@ -28,7 +28,6 @@ public class Test2 {
         frame.setSize(1600, 900);
         frame.setLayout(new GridLayout(3, 1));
 
-
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
 
@@ -90,7 +89,14 @@ public class Test2 {
                     DecodeLabel.setText("valA: " + valA + "     valB: " + valB);
                     FetchLabel.setText("rA: " + rA + "     rB: " + rB + "     valC: "+valC + "     valP:"+valP);
                     ConditionLabel.setText("ZF: " + conditionCodes.get("ZF") + "     SF: " + conditionCodes.get("SF")+ "     OF: " + conditionCodes.get("OF")); 
-                    RegisterLabel.setText("valM: " + valM);
+                    RegisterLabel.setText(  "%eax: "+ registers.get(0) + "     " +
+                                            "%ecx: "+ registers.get(1) + "     " +
+                                            "%edx: "+ registers.get(2) + "     " +
+                                            "%ebx: "+ registers.get(3) + "     " +
+                                            "%esi: "+ registers.get(6) + "     " +
+                                            "%edi: "+ registers.get(7) + "     " +
+                                            "%esp: "+ registers.get(4) + "     " +
+                                            "%ebp: "+ registers.get(5) + "     " );
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -99,6 +105,7 @@ public class Test2 {
 
         frame.add(runButton);
         frame.add(labelPanel);
+        // frame.add(scrollPane);
         frame.setVisible(true);
     }
 
