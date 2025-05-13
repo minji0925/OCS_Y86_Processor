@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,10 +35,10 @@ public class Test2 {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
-         public void windowClosing(WindowEvent windowEvent){
-            System.exit(0);
-         }        
-      });   
+            public void windowClosing(WindowEvent windowEvent){
+                System.exit(0);
+            }        
+        });   
 
         JLabel PCLabel = new JLabel("",JLabel.CENTER);   
         PCLabel.setFont(new Font("Calibri", Font.BOLD, 20));
@@ -103,9 +105,24 @@ public class Test2 {
             }
         });
 
+        int n = stack.length;
+      
+        String[] columnNames = {"Index", "Value"};
+        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+
+        for (int i = 0; i < n; i++) {
+            Object[] row = {i, stack[i]};
+            model.addRow(row);
+        }
+
+        JTable table = new JTable(model);
+        JScrollPane scrollPane = new JScrollPane(table);
+
+
+
         frame.add(runButton);
         frame.add(labelPanel);
-        // frame.add(scrollPane);
+        frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
         frame.setVisible(true);
     }
 
