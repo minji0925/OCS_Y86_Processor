@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.event.*;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -10,6 +11,10 @@ public class Test2 {
     static String code = "";
     static int PC = 0;
     static char icode, ifun = '0';
+    static int rA, rB, valC, valP = 0;
+    static int valA, valB = 0;
+    static int cnd, valE = 0;
+    static int valM = 0;
 
     //consider each element of the stack array to be one line in the stack (8 bytes, so that it's in sync with the length of valC and pointers)
     static int[] stack = new int[300];
@@ -20,83 +25,140 @@ public class Test2 {
 
     public static void createAndShowGUI() {
         JFrame frame = new JFrame("Y86 Processor");
-        frame.setSize(300, 200);
+        frame.setSize(1600, 900);
+        frame.setLayout(new GridLayout(3, 1));
+
+
+        JPanel labelPanel = new JPanel();
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.PAGE_AXIS));
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+         public void windowClosing(WindowEvent windowEvent){
+            System.exit(0);
+         }        
+      });   
+
+        JLabel PCLabel = new JLabel("",JLabel.CENTER);   
+        PCLabel.setFont(new Font("Calibri", Font.BOLD, 20));
+        PCLabel.setSize(100,200);
+        JLabel MemoryLabel = new JLabel("",JLabel.CENTER);  
+        MemoryLabel.setFont(new Font("Calibri", Font.BOLD, 20));      
+        MemoryLabel.setSize(100,200);
+        JLabel ExecuteLabel = new JLabel("",JLabel.CENTER);
+        ExecuteLabel.setFont(new Font("Calibri", Font.BOLD, 20));        
+        ExecuteLabel.setSize(100,200);
+        JLabel DecodeLabel = new JLabel("",JLabel.CENTER);  
+        DecodeLabel.setFont(new Font("Calibri", Font.BOLD, 20));      
+        DecodeLabel.setSize(100,200);
+        JLabel FetchLabel = new JLabel("",JLabel.CENTER);   
+        FetchLabel.setFont(new Font("Calibri", Font.BOLD, 20));     
+        FetchLabel.setSize(100,200);
+        JLabel ConditionLabel = new JLabel("",JLabel.CENTER);
+        ConditionLabel.setFont(new Font("Calibri", Font.BOLD, 20));        
+        ConditionLabel.setSize(100,200);
+        JLabel RegisterLabel = new JLabel("",JLabel.CENTER);
+        RegisterLabel.setFont(new Font("Calibri", Font.BOLD, 20));        
+        RegisterLabel.setSize(100,200);
+
+        labelPanel.add(PCLabel);
+        labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        labelPanel.add(MemoryLabel);
+        labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        labelPanel.add(ExecuteLabel);
+        labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        labelPanel.add(DecodeLabel);
+        labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        labelPanel.add(FetchLabel);
+        labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        labelPanel.add(ConditionLabel);
+        labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        labelPanel.add(RegisterLabel);
+        labelPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+
 
         JButton runButton = new JButton("Run Instruction");
+
         runButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     code = Files.lines(Paths.get("file.txt")).collect(Collectors.joining());
                     fetch(code);
+                    PCLabel.setText("PC: " + PC);
+                    MemoryLabel.setText("valM: " + valM);
+                    ExecuteLabel.setText("Condition: " + String.valueOf(cnd) + "     ValE: " + String.valueOf(valE));
+                    DecodeLabel.setText("valA: " + valA + "     valB: " + valB);
+                    FetchLabel.setText("rA: " + rA + "     rB: " + rB + "     valC: "+valC + "     valP:"+valP);
+                    ConditionLabel.setText("ZF: " + conditionCodes.get("ZF") + "     SF: " + conditionCodes.get("SF")+ "     OF: " + conditionCodes.get("OF")); 
+                    RegisterLabel.setText("valM: " + valM);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
         });
 
-        frame.getContentPane().add(runButton);
+        frame.add(runButton);
+        frame.add(labelPanel);
         frame.setVisible(true);
     }
 
     public static void fetch(String code){
-        int rA = 0, rB = 0, valC = 0, valP = 0;
         icode = code.charAt(PC);
         ifun = code.charAt(PC+1);
         switch(icode){
-            case '0':
+            case '0': //halt
                 System.exit(0);
             //how to deal with a 0? is it padding or halt? padding in between instructions probably doesn't happen
                 break;
-            case '1':
+            case '1': //nop
                 valP = PC + 2;
                 break;
-            case '2':
+            case '2': //rrmovl + cmovXX
                 rA = Integer.parseInt(String.valueOf(code.charAt(PC+2)), 16);
                 rB = Integer.parseInt(String.valueOf(code.charAt(PC+3)), 16);
                 valP = PC + 4;
                 break;
             //valC is now an integer, not hex - no need to worry about conversion from here
-            case '3':
+            case '3': //irmovl
                 rA = 15;
                 rB = Integer.parseInt(String.valueOf(code.charAt(PC+3)), 16);
                 valC = Integer.parseInt(code.substring(PC+4, PC+20), 16);
                 valP = PC + 20;
                 break;
-            case '4':
+            case '4': //rmmovl
                 rA = 15;
                 rB = Integer.parseInt(String.valueOf(code.charAt(PC+3)), 16);
                 valC = Integer.parseInt(code.substring(PC+4, PC+20), 16);
                 valP = PC + 20;
                 break;
-            case '5':
+            case '5': //mrmovl
                 rA = 15;
                 rB = Integer.parseInt(String.valueOf(code.charAt(PC+3)), 16);
                 valC = Integer.parseInt(code.substring(PC+4, PC+20), 16);
                 valP = PC + 20;
                 break;
-            case '6':
+            case '6': //Opl
                 rA = Integer.parseInt(String.valueOf(code.charAt(PC+2)), 16);
                 rB = Integer.parseInt(String.valueOf(code.charAt(PC+3)), 16);
                 valP = PC + 4;
                 break;
-            case '7':
+            case '7': //jXX
                 valC = Integer.parseInt(code.substring(PC+2, PC+18), 16);
                 valP = valC;
                 break;
-            case '8':
+            case '8': //call
                 valC = Integer.parseInt(code.substring(PC+2, PC+18), 16);
-                valP = valC;
+                valP = valC; //shouldn't valP be PC+5
                 break;
-            case '9':
+            case '9': //ret
                 valP = PC + 1;
                 break;
-            case 'A':
+            case 'A': //pushl
                 rA = Integer.parseInt(String.valueOf(code.charAt(PC+2)), 16);
                 rB = 15;
                 valP = PC + 4;
                 break;
-            case 'B':
+            case 'B': //popl
                 rA = Integer.parseInt(String.valueOf(code.charAt(PC+2)), 16);
                 rB = 15;
                 valP = PC + 4;
@@ -107,7 +169,6 @@ public class Test2 {
     }
     
     public static void decode(int rA, int rB, int valC, int valP){
-        int valA = 0, valB = 0;
         switch(icode){
             case '2':
                 valA = registers.get(rA);
@@ -146,42 +207,34 @@ public class Test2 {
 
     public static void execute(int rA, int rB, int valA, int valB, int valC, int valP){
         //cnd: 0 if condition is not satisfied, 1 if satisfied
-        int cnd = 0;
-        int valE = 0;
         switch(icode){
             //cmov - do the switch case thing
             case '2':
-            switch(ifun){
-                case '0':
-                    cnd = 1;
-                    break;
-                //less or equal
-                case '1':
-                    cnd = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) | conditionCodes.get("ZF");
-                    break;
-                //less
-                case '2':
-                    cnd = conditionCodes.get("SF") ^ conditionCodes.get("OF");
-                    break;
-                //equal
-                case '3':
-                    cnd = conditionCodes.get("ZF");
-                    break;
-                //not equal
-                case '4':
-                    cnd = conditionCodes.get("ZF") == 0 ? 1 : 0;
-                    break;
-                //greater
-                //needs rechecking
-                case '5':
-                    cnd = ((conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 && conditionCodes.get("ZF") == 0) ? 1 : 0;
-                    break;
-                //greater or equal
-                case '6':
-                    cnd = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 ? 1 : 0;
-                    break;
-            }
                 valE = 0 + valA;
+                switch(ifun){
+                    case '0': //rrmovl
+                        cnd = 1;
+                        break;
+                    case '1': //cmovle
+                        cnd = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) | conditionCodes.get("ZF");
+                        break;
+                    case '2': //cmovl
+                        cnd = conditionCodes.get("SF") ^ conditionCodes.get("OF");
+                        break;
+                    case '3': //cmove
+                        cnd = conditionCodes.get("ZF");
+                        break;
+                    case '4': //cmovne
+                        cnd = conditionCodes.get("ZF") == 0 ? 1 : 0;
+                        break;
+                    //needs rechecking
+                    case '5': //cmovge
+                        cnd = ((conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 && conditionCodes.get("ZF") == 0) ? 1 : 0;
+                        break;
+                    case '6': //cmovg
+                        cnd = (conditionCodes.get("SF") ^ conditionCodes.get("OF")) == 0 ? 1 : 0;
+                        break;
+                }
                 break;
             case '3':
                 valE = 0 + valC;
@@ -278,7 +331,6 @@ public class Test2 {
 
     //this needs some editing - memory should be organized in a way where each element is one digit of a hex number
     public static void memory(int rA, int rB, int valA, int valB, int valC, int valE, int valP, int cnd){
-        int valM = 0;
         switch(icode){
             case '4':
                 stack[valE] = valA;
@@ -288,7 +340,7 @@ public class Test2 {
                 valM = stack[valE];
                 break;
             case '8':
-                stack[registers.get(4)] = valP;
+                stack[registers.get(4)] = valP; //shouldn't it be stack[valE]? Also why is valE=valB-1? i thought it was valB-4
                 System.out.println("stack[%esp]: " + stack[registers.get(4)]);
                 break;
             case '9':
