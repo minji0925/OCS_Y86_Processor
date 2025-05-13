@@ -82,6 +82,26 @@ public class Test2 {
 
         JButton runButton = new JButton("Run Instruction");
 
+        int n = stack.length;
+        DefaultTableModel model = new DefaultTableModel();
+
+        //Col
+        for (int i = 0; i < n; i++) {
+            model.addColumn(i);
+        }
+        //Row
+        Object[] row = new Object[n];
+        for (int i = 0; i < n; i++) {
+            row[i] = stack[i];
+        }
+        model.addRow(row);
+
+        JTable table = new JTable(model);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        JScrollPane scrollPane = new JScrollPane(table);
+
+
+
         runButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -101,30 +121,18 @@ public class Test2 {
                                             "%edi: "+ registers.get(7) + "     " +
                                             "%esp: "+ registers.get(4) + "     " +
                                             "%ebp: "+ registers.get(5) + "     " );
+
+                    for (int i = 0; i < n; i++) {
+                        model.setValueAt(stack[i], 0, i); // Update row 0, column i
+                    }
+                    model.fireTableDataChanged();
+
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
         });
 
-        int n = stack.length;
-      
-        DefaultTableModel model = new DefaultTableModel();
-
-        //Col
-        for (int i = 0; i < n; i++) {
-            model.addColumn(i);
-        }
-        //Row
-        Object[] row = new Object[n];
-        for (int i = 0; i < n; i++) {
-            row[i] = stack[i];
-        }
-        model.addRow(row);
-
-        JTable table = new JTable(model);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        JScrollPane scrollPane = new JScrollPane(table);
 
         frame.add(runButton);
         frame.add(labelPanel);
@@ -436,6 +444,9 @@ public class Test2 {
                 PC = valP;
         }
         System.out.println("PC: " + PC);
+        for (int asdf=0; asdf<stack.length; asdf++){
+            System.out.print(stack[asdf]);
+        }
         //printResult(rA, rB, valA, valB, valC, valE, valP, valM, cnd);
     }
 
