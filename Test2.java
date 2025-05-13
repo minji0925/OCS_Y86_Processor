@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -107,22 +109,26 @@ public class Test2 {
 
         int n = stack.length;
       
-        String[] columnNames = {"Index", "Value"};
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+        DefaultTableModel model = new DefaultTableModel();
 
+        //Col
         for (int i = 0; i < n; i++) {
-            Object[] row = {i, stack[i]};
-            model.addRow(row);
+            model.addColumn(i);
         }
+        //Row
+        Object[] row = new Object[n];
+        for (int i = 0; i < n; i++) {
+            row[i] = stack[i];
+        }
+        model.addRow(row);
 
         JTable table = new JTable(model);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         JScrollPane scrollPane = new JScrollPane(table);
-
-
 
         frame.add(runButton);
         frame.add(labelPanel);
-        frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
+        frame.add(scrollPane);
         frame.setVisible(true);
     }
 
