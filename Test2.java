@@ -160,7 +160,7 @@ public class Test2 {
             case '3': //irmovl
                 rA = 15;
                 rB = Integer.parseInt(String.valueOf(code.charAt(PC+3)), 16);
-                valC = Integer.parseInt(code.substring(PC+4, PC+20), 16);
+                valC = (int) Long.parseUnsignedLong(code.substring(PC+4, PC+20), 16);
                 valP = PC + 20;
                 break;
             case '4': //rmmovl
@@ -182,7 +182,7 @@ public class Test2 {
                 break;
             case '7': //jXX
                 valC = Integer.parseInt(code.substring(PC+2, PC+18), 16);
-                valP = valC;
+                valP = PC + 18;
                 break;
             case '8': //call
                 valC = Integer.parseInt(code.substring(PC+2, PC+18), 16);
