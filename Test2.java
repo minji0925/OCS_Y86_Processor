@@ -188,7 +188,7 @@ public class Test2 {
                 break;
             case '8': //call
                 valC = Integer.parseInt(code.substring(PC+2, PC+18), 16);
-                valP = valC; //shouldn't valP be PC+5
+                valP = PC + 5; //shouldn't valP be PC+5
                 break;
             case '9': //ret
                 valP = PC + 1;
@@ -380,7 +380,7 @@ public class Test2 {
                 valM = stack[valE];
                 break;
             case '8':
-                stack[registers.get(4)] = valP; //shouldn't it be stack[valE]? Also why is valE=valB-1? i thought it was valB-4
+                stack[valE] = valP; //shouldn't it be stack[valE]? Also why is valE=valB-1? i thought it was valB-4
                 System.out.println("stack[%esp]: " + stack[registers.get(4)]);
                 break;
             case '9':
@@ -413,6 +413,7 @@ public class Test2 {
                 registers.replace(rB, valE);
                 break;
             case '8':
+                registers.replace(4, valE);
             case '9':
             case 'A':
                 registers.replace(4, valE);
