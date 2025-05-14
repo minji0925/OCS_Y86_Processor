@@ -103,14 +103,15 @@ public class Test2 {
         JScrollPane scrollPane = new JScrollPane(table);
 
 
+
         runButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     code = Files.lines(Paths.get("file.txt")).collect(Collectors.joining());
                     int code_bytelen = code.length()/2;
                     for (int i=0; i<code_bytelen; i++){
-                        String sub = code.substring(2*i,2*i+2);
-                        stack[i] = Integer.parseInt(sub, 16);;
+                        String sub = code.substring(i,i+1);
+                        stack[i] = Integer.parseInt(sub, 16);
                     }
                     model.fireTableDataChanged();
 
@@ -132,7 +133,7 @@ public class Test2 {
                                             "%ebp: "+ String.format("0x%03x", registers.get(5)) + "     " );
 
                     for (int i = 0; i < n; i++) {
-                        model.setValueAt(String.format("0x%02x", stack[i]), 0, i); // Update row 0, column i
+                        model.setValueAt(String.format("%01x", stack[i]), 0, i); // Update row 0, column i
                     }
                     model.fireTableDataChanged();
 
