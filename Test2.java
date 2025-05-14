@@ -64,16 +64,18 @@ public class Test2 {
         RegisterLabel.setFont(new Font("Calibri", Font.BOLD, 20));        
         RegisterLabel.setSize(100,200);
 
-        labelPanel.add(PCLabel);
-        labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
-        labelPanel.add(MemoryLabel);
-        labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
-        labelPanel.add(ExecuteLabel);
+        
+        labelPanel.add(FetchLabel);
         labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
         labelPanel.add(DecodeLabel);
         labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
-        labelPanel.add(FetchLabel);
+        labelPanel.add(ExecuteLabel);
         labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        labelPanel.add(MemoryLabel);
+        labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
+        labelPanel.add(PCLabel);
+        labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
+
         labelPanel.add(ConditionLabel);
         labelPanel.add(Box.createRigidArea(new Dimension(0,5)));
         labelPanel.add(RegisterLabel);
@@ -87,7 +89,7 @@ public class Test2 {
 
         //Col
         for (int i = 0; i < n; i++) {
-            model.addColumn(i);
+            model.addColumn(String.format("0x%03x", i));
         }
         //Row
         Object[] row = new Object[n];
@@ -107,20 +109,20 @@ public class Test2 {
                 try {
                     code = Files.lines(Paths.get("file.txt")).collect(Collectors.joining());
                     fetch(code);
-                    PCLabel.setText("PC: " + PC);
+                    PCLabel.setText("PC: " + PC + "     valP:" + valP);
                     MemoryLabel.setText("valM: " + valM);
-                    ExecuteLabel.setText("Condition: " + String.valueOf(cnd) + "     ValE: " + String.valueOf(valE));
+                    ExecuteLabel.setText("ValE: " + String.format("0x%03x", valE));
                     DecodeLabel.setText("valA: " + valA + "     valB: " + valB);
-                    FetchLabel.setText("rA: " + rA + "     rB: " + rB + "     valC: "+valC + "     valP:"+valP);
-                    ConditionLabel.setText("ZF: " + conditionCodes.get("ZF") + "     SF: " + conditionCodes.get("SF")+ "     OF: " + conditionCodes.get("OF")); 
-                    RegisterLabel.setText(  "%eax: "+ registers.get(0) + "     " +
-                                            "%ecx: "+ registers.get(1) + "     " +
-                                            "%edx: "+ registers.get(2) + "     " +
-                                            "%ebx: "+ registers.get(3) + "     " +
-                                            "%esi: "+ registers.get(6) + "     " +
-                                            "%edi: "+ registers.get(7) + "     " +
-                                            "%esp: "+ registers.get(4) + "     " +
-                                            "%ebp: "+ registers.get(5) + "     " );
+                    FetchLabel.setText("icode: 0x"+ icode + "     ifun: 0x" + ifun + "     rA: " + String.format("0x%01x", rA) + "     rB: " + String.format("0x%01x", rB) + "     valC: " + String.format("0x%03x", valC));
+                    ConditionLabel.setText("Condition: " + String.valueOf(cnd) + "     ZF: " + conditionCodes.get("ZF") + "     SF: " + conditionCodes.get("SF")+ "     OF: " + conditionCodes.get("OF")); 
+                    RegisterLabel.setText(  "%eax: "+ String.format("0x%03x", registers.get(0)) + "     " +
+                                            "%ecx: "+ String.format("0x%03x", registers.get(1)) + "     " +
+                                            "%edx: "+ String.format("0x%03x", registers.get(2)) + "     " +
+                                            "%ebx: "+ String.format("0x%03x", registers.get(3)) + "     " +
+                                            "%esi: "+ String.format("0x%03x", registers.get(6)) + "     " +
+                                            "%edi: "+ String.format("0x%03x", registers.get(7)) + "     " +
+                                            "%esp: "+ String.format("0x%03x", registers.get(4)) + "     " +
+                                            "%ebp: "+ String.format("0x%03x", registers.get(5)) + "     " );
 
                     for (int i = 0; i < n; i++) {
                         model.setValueAt(stack[i], 0, i); // Update row 0, column i
