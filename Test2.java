@@ -116,10 +116,10 @@ public class Test2 {
 
 
                     fetch(code);
-                    PCLabel.setText("PC: " + PC + "     valP:" + valP);
+                    PCLabel.setText("PC: " + String.format("0x%03x", PC) + "     valP:" + String.format("0x%03x", valP));
                     MemoryLabel.setText("valM: " + valM);
                     ExecuteLabel.setText("ValE: " + String.format("0x%03x", valE));
-                    DecodeLabel.setText("valA: " + valA + "     valB: " + valB);
+                    DecodeLabel.setText("valA: " + String.format("0x%03x", valA) + "     valB: " + String.format("0x%03x", valB));
                     FetchLabel.setText("icode: 0x"+ icode + "     ifun: 0x" + ifun + "     rA: " + String.format("0x%01x", rA) + "     rB: " + String.format("0x%01x", rB) + "     valC: " + String.format("0x%03x", valC));
                     ConditionLabel.setText("Condition: " + String.valueOf(cnd) + "     ZF: " + conditionCodes.get("ZF") + "     SF: " + conditionCodes.get("SF")+ "     OF: " + conditionCodes.get("OF")); 
                     RegisterLabel.setText(  "%eax: "+ String.format("0x%03x", registers.get(0)) + "     " +
