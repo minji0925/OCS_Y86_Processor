@@ -353,7 +353,7 @@ public class Test2 {
                 break;
             //move the stack pointer down 8 bytes (= one element in the stack array) to store valP on the top of the stack
             case '8':
-                valE = valB - 1;
+                valE = valB - 4;
                 break;
             case '9':
                 valE = valB + 1;
