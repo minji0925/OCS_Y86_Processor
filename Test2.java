@@ -387,7 +387,7 @@ public class Test2 {
                 valM = stack[valE];
                 break;
             case '8':
-                stack[register.get(4)] = valP; //shouldn't it be stack[valE]? Also why is valE=valB-1? i thought it was valB-4
+                stack[registers.get(4)] = valP; //shouldn't it be stack[valE]? Also why is valE=valB-1? i thought it was valB-4
                 System.out.println("stack[%esp]: " + stack[registers.get(4)]);
                 break;
             case '9':
