@@ -121,7 +121,7 @@ public class Test3 {
                     MemoryLabel.setText("valM: " + valM);
                     ExecuteLabel.setText("ValE: " + String.format("0x%03x", valE));
                     DecodeLabel.setText("valA: " + String.format("0x%03x", valA) + "     valB: " + String.format("0x%03x", valB));
-                    FetchLabel.setText("icode: 0x"+ icode + "     ifun: 0x" + ifun + "     rA: " + String.format("0x%01x", rA) + "     rB: " + String.format("0x%01x", rB) + "     valC: " + String.format("0x%03x", valC));
+                    FetchLabel.setText("icode,ifun: 0x"+ icode +ifun + "     rA,rB: " + String.format("0x%01x", rA*16+rB) + "     valC: " + String.format("0x%03x", valC));
                     ConditionLabel.setText("Condition: " + String.valueOf(cnd) + "     ZF: " + conditionCodes.get("ZF") + "     SF: " + conditionCodes.get("SF")+ "     OF: " + conditionCodes.get("OF")); 
                     RegisterLabel.setText(  "%eax: "+ String.format("0x%03x", registers.get(0)) + "     " +
                                             "%ecx: "+ String.format("0x%03x", registers.get(1)) + "     " +
@@ -193,13 +193,16 @@ public class Test3 {
             case '7': //jXX
                 valC = Integer.parseInt(code.substring(2*(PC+1), 2*(PC+9)), 16);
                 valP = PC + 9;
+                rA=0; rB = 0;
                 break;
             case '8': //call
                 valC = Integer.parseInt(code.substring(2*(PC+1), 2*(PC+9)), 16);
                 valP = PC + 5; //shouldn't valP be PC+5
+                rA=0; rB = 0;
                 break;
             case '9': //ret
                 valP = PC + 1;
+                rA=0; rB = 0;
                 break;
             case 'A': //pushl
                 rA = Integer.parseInt(String.valueOf(code.charAt(2*(PC+1))), 16);
